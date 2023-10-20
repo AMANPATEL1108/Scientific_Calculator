@@ -5,7 +5,13 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import java.lang.RuntimeException
+import kotlin.math.sqrt
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.cos
+import kotlin.math.tan
+import kotlin.math.log10
+import kotlin.math.ln
 
 class MainActivity : AppCompatActivity() {
     lateinit var secondaryTV: TextView
@@ -40,7 +46,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var btnAdd: Button
     lateinit var btnEqual: Button
     lateinit var btnDiv: Button
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +83,6 @@ class MainActivity : AppCompatActivity() {
         btn2 = findViewById(R.id.idBtn2)
         btn1 = findViewById(R.id.idBtn1)
         btn0 = findViewById(R.id.idBtn0)
-
-
 
         btn0.setOnClickListener {
             primaryTV.text = (primaryTV.text.toString() + "0")
@@ -139,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             primaryTV.text = (primaryTV.text.toString() + "tan")
         }
         invBtn.setOnClickListener {
-            primaryTV.text = (primaryTV.text.toString() + "^" + "(-1")
+            primaryTV.text = (primaryTV.text.toString() + "^" + "(-1)")
         }
         lnBtn.setOnClickListener {
             primaryTV.text = (primaryTV.text.toString() + "ln")
@@ -150,22 +153,22 @@ class MainActivity : AppCompatActivity() {
 
         btnSub.setOnClickListener {
             val str: String = primaryTV.text.toString()
-            if (!str.get(index = str.length - 1).equals("-")) {
+            if (!str.endsWith("-")) {
                 primaryTV.text = (primaryTV.text.toString() + "-")
             }
         }
         btnMul.setOnClickListener {
             val str: String = primaryTV.text.toString()
-            if (!str.get(index = str.length - 1).equals("*")) {
+            if (!str.endsWith("*")) {
                 primaryTV.text = (primaryTV.text.toString() + "*")
             }
         }
         sqRootBtn.setOnClickListener {
             if (primaryTV.text.toString().isEmpty()) {
-                Toast.makeText(this, "please Enter Valid Number!!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter a valid number!!", Toast.LENGTH_SHORT).show()
             } else {
                 val str: String = primaryTV.text.toString()
-                val r = Math.sqrt(str.toDouble())
+                val r = sqrt(str.toDouble())
                 val result = r.toString()
                 primaryTV.text = result
             }
@@ -178,123 +181,17 @@ class MainActivity : AppCompatActivity() {
             var str: String = primaryTV.text.toString()
             if (!str.equals("")) {
                 str = str.substring(0, str.length - 1)
-                primaryTV.text = (primaryTV.text.toString() + "*")
+                primaryTV.text = str
             }
         }
         squareBtn.setOnClickListener {
             if (primaryTV.text.toString().isEmpty()) {
-                Toast.makeText(this, "please enter a valid number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show()
             } else {
                 val d: Double = primaryTV.text.toString().toDouble()
                 val square = d * d
                 secondaryTV.text = square.toString()
             }
         }
-        factBtn.setOnClickListener {
-            if (primaryTV.text.toString().isEmpty()) {
-                Toast.makeText(this, "please Enter a Valid Number", Toast.LENGTH_SHORT).show()
-            } else {
-                val value: Int = primaryTV.text.toString().toInt()
-                val fact: Int = factorial(value)
-                primaryTV.text = fact.toString()
-                secondaryTV.text = fact.toString()
-            }
-        }
-        btnEqual.setOnClickListener {
-            val str: String = primaryTV.text.toString()
-            val result: Double = evaluate(str)
-            val r = result.toString()
-            primaryTV.text = r
-            secondaryTV.text = str
-        }
-
-        fun factorial(n: Int): Int {
-            return if (n == 1 || n == 0) 1 else n * factorial(n - 1)
-        }
-
-        fun evaluate(str: String): Double {
-            return object : Any() {
-                var pos = -1
-                var ch = 0
-
-                fun nextChar() {
-                    ch = if (++pos < str.length) str[pos].toInt() else -1
-                }
-
-                fun eat(charToEdt: Int): Boolean {
-                    while (ch == ' '.toInt()) nextChar()
-
-                    if (ch == charToEdt) {
-                        nextChar()
-                        return true
-                    }
-                    return false
-                }
-
-                fun parse(): Double {
-                    nextChar()
-                    val x = parseExpression()
-                    if (pos < str.length) throw RuntimeException("Unexpected:" + ch.toChar())
-                    return x
-                }
-
-                fun parseExpression(): Double {
-                    var x = parseterm()
-                    while (true)
-                        if (eat('+'.toInt())) x += parseterm()
-                        else if (eat('-'.toInt())) x -= parseterm()
-                        else return x
-                }
-            }
-            fun parseterm(): Double {
-                var x = parseFactor()
-                while (true) {
-                    if (eat('*'.toInt())) x *= parseFactor()
-                    else if (eat('/'.toInt())) x /= parseFactor()
-                    else return x
-                }
-            }
-
-            fun parseFactor(: Double) {
-                if (eat('+'.toInt())) return parseFactor()
-                if (eat('-'.toInt())) return -parseterm()
-
-                var x = Double
-                val startPos = pos
-
-                if (eat('('.toInt())) {
-                    x = parseEpression()
-                    eat(')'.toInt())
-                } else if (ch > '0'.toInt() && ch < '9'.toInt() || ch == '.'.toInt()) {
-                    while (ch > '0'.toInt() && ch <= '9'.toInt() || ch == "-".toInt()) nextChar()
-
-                    x = str.substring(startPos, pos).toDouble()
-                } else if (ch >= 'a'.toInt() && ch <= 'z'.toInt()) {
-                    while (ch >= 'a'.toInt() && ch <= 'z'.toInt()) nextChar()
-                    val func = str.substring(startPos, pos)
-                    x = parseFactor()
-                   if(func=='sqrt'){
-                       x=Math.sqrt(x)
-                   }else if (func=="sin"){
-                       x=Math.sin(Math.toRadians(x))
-                   }else if(func=="cos"){
-                       x=Math.cos(Math.toRadians(x))
-                   }else if (func=="tan"){
-                       x=Math.tan(Math.toRadians(x))
-                   }else if (func=="log"){
-                       x=Math.log10(x)
-                   }else if (func=="ln") {
-                       x = Math.log(x)
-
-                   }
-                } else {
-                    throw RuntimeException("Unexpected:" + ch.toChar())
-                }
-                if (eat('^'.toInt())) x = Math.pow(x, parseFactor())
-                return x
-
-
-            }
-        }.parse()
     }
 }
